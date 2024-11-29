@@ -1,0 +1,155 @@
+// Keywords: 
+
+initialize() {
+	defineConstant("N", 2000);
+	defineConstant("L", 1000);               // chromosome length
+	defineConstant("teInitialCount", 1);  // initial number of TEs
+	defineConstant("teJumpP", 0.01);      // TE jump probability
+	defineConstant("teDisableP", 0.00000001);  // disabling mut probability
+	defineConstant("teDeathRate", 0.005); //probability of lethal transposition
+	defineConstant("simTime", 650);
+	
+	
+	initializeMutationRate(0);
+	initializeMutationType("m1", 0.5, "f", 0.0);  // neutral
+	initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElement(g1, 0, L-1);
+	// initializeRecombinationRate(1e-8);
+	initializeRecombinationRate(0);
+	
+	// transposon mutation type; also neutral, but red
+	initializeMutationType("m2", 0.5, "f", 0.0);
+	m2.convertToSubstitution = F;
+	m2.color = "#030FFC";
+	
+	// disabled transposon mutation type; dark red
+	initializeMutationType("m3", 0.5, "f", 0.0);
+	m3.convertToSubstitution = F;
+	m3.color = "#FF0000";
+
+}
+
+1 early() {
+	sim.addSubpop("p1", N);
+	sim.tag = 0;	// the next unique tag value to use for TEs
+	
+	// create some transposons at random positions
+	genomes = sim.subpopulations.individuals.genome1;
+	positions = rdunif(teInitialCount, 0, L-1);
+	
+	for (teIndex in 0:(teInitialCount-1))
+	{
+		pos = positions[teIndex];
+		mut = genomes.addNewDrawnMutation(m2, pos);
+		mut.tag = sim.tag;
+		sim.tag = sim.tag + 1;
+	}
+	//teAllCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
+	//catn(teAllCounts);
+	defineGlobal('teAllCounts', matrix(rep(0, N*simTime), simTime, N));
+}
+
+
+//early(){
+//	cat('early() fitness scaling: \n');
+//	cat(sim.subpopulations.individuals.fitnessScaling + ' ');
+//	cat('\n');
+//}
+
+2: early() {
+	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
+	//catn(teCounts);
+	teAllCounts[sim.cycle-1, ] = teCounts;
+	//catn(teAllCounts[sim.cycle-1, ]);
+	//catn(teAllCounts);
+	
+	
+	// make active transposons copy themselves with rate teJumpP
+	for (individual in sim.subpopulations.individuals){
+		
+		// fitness rescaling for random lethal transpositions. 
+		nTE = individual.countOfMutationsOfType(m2);
+		//cat((1 - teDeathRate) ^ nTE + ' ');
+		if (runif(1) < (1 - teDeathRate) ^ (nTE)) {
+			individual.fitnessScaling = 1.0;}
+		else {
+			individual.fitnessScaling = 0.0;}
+		
+		for (genome in individual.genomes){
+			
+			tes = genome.mutationsOfType(m2);
+			teCount = tes.size();
+			//jumpCount = teCount ? rbinom(1, teCount, teJumpP) else 0;
+			jumpCount = rbinom(1, teCount, teJumpP);
+			//cat(jumpCount + ' ');
+			
+			if (jumpCount){
+				//cat(tes);
+				//cat(jumpCount);
+				jumpTEs = sample(tes, jumpCount);
+				
+				for (te in jumpTEs){
+					// make a new TE mutation
+					target = sample(individual.genomes, 1);
+					pos = rdunif(1, 0, L-1);
+					jumpTE = target.addNewDrawnMutation(m2, pos);
+					jumpTE.tag = sim.tag;
+					sim.tag = sim.tag + 1;
+				}
+			}
+		}
+	}
+	//cat('early() fitness scaling after setting: \n');
+	//catn(sim.subpopulations.individuals.fitnessScaling + ' ');
+	//cat('\n');
+}
+
+
+simTime late() {
+	
+	x = seqLen(nrow(teAllCounts));
+	mean_TE = sapply(seqLen(nrow(teAllCounts)), "mean(teAllCounts[applyValue,]);");
+	max_TE = sapply(seqLen(nrow(teAllCounts)), "max(teAllCounts[applyValue,]);");
+	min_TE = sapply(seqLen(nrow(teAllCounts)), "min(teAllCounts[applyValue,]);");
+	
+	
+	if (exists("slimgui")) {
+		plot = slimgui.createPlot("TE evolution",
+			xlab="Generation", ylab="Number of TEs", width=700, height=250);
+		
+		plot.lines(x, mean_TE, 'red');
+		plot.lines(x, max_TE, 'cornflowerblue');
+		plot.lines(x, min_TE, 'green');
+		plot.addLegend("topLeft", inset=0, labelSize=13);
+		plot.legendLineEntry("mean", "red", lwd=2);
+		plot.legendLineEntry("max", "cornflowerblue", lwd=2);
+		plot.legendLineEntry("min", "green", lwd=2);
+	}
+	
+	// print information on each TE, including the fraction of it disabled
+	all_tes = sortBy(sim.mutationsOfType(m2), "position");
+	all_disabledTEs = sortBy(sim.mutationsOfType(m3), "position");
+	genomeCount = size(sim.subpopulations.genomes);
+	//sim.outputMutations(sim.mutationsOfType(m2));
+	//catn("Active TEs:");
+	for (te in all_tes)
+	{//cat("   TE at " + te.position + ": ");
+		active = sim.mutationCounts(NULL, te);
+		disabledTE = all_disabledTEs[all_disabledTEs.tag == te.tag];
+		if (size(disabledTE) == 0)
+		{disabled = 0;}
+		else{
+			disabled = sim.mutationCounts(NULL, disabledTE);
+			all_disabledTEs = all_disabledTEs[all_disabledTEs != disabledTE];}
+		total = active + disabled;
+		//cat("frequency " + format("%0.3f", total / genomeCount) + ", ");
+		//catn(round(active / total * 100) + "% active");
+	}
+	// catn("\nCompletely disabled TEs: ");
+	for (te in all_disabledTEs)
+	{freq = sim.mutationFrequencies(NULL, te);
+		//cat("   TE at " + te.position + ": ");
+		//catn("frequency " + format("%0.3f", freq));
+	}
+}
+
