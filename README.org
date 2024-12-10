@@ -1,0 +1,23 @@
+#+title: Slim model of TEs
+
+* Parameters and Variables
+- 'N': Number of individuals
+- 'L': Genome length (mutations are stackable, so we can use length 1 for efficiency)
+- 'simTime': simulation time in generations
+
+- 'teinitialCount': initial number of TEs in each individual (heterozygous in the diploid model)
+- 'teJumpP': probability of a TE to jump to a random genomic position
+- 'teDeathRate': probability of lethal transposition
+
+
+* Run simulations from command line
+#+begin_src sh
+slim -d N=1000 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 TE_haploid_WIAS.slim
+#+end_src
+
+* TODO Open Tasks
+- [X] Haploid model
+- add cli options to diploid model
+- write R script for plotting replicate simulations
+  - write simfile parser in R script
+- store parameters in JSON file for default values

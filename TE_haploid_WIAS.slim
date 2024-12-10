@@ -1,0 +1,127 @@
+// Keywords: 
+
+initialize() {
+	if (!exists("N")) defineConstant("N", 5000);
+	if (!exists("L")) defineConstant("L", 1);               // chromosome length
+    if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
+
+	//TE dynamics paramters
+	if (!exists("teInitialCount")) defineConstant("teInitialCount", 1);  // initial number of TEs
+	if (!exists("teJumpP")) defineConstant("teJumpP", 0.01);      // TE jump probability
+	if (!exists("teDeathRate")) defineConstant("teDeathRate", 0.0005); //probability of lethal transposition
+	if (!exists("simTime")) defineConstant("simTime", 2000);
+	
+	//Genomic paramters
+	initializeMutationRate(0);
+	initializeMutationType("m1", 0.5, "f", 0.0);  // neutral
+	initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElement(g1, 0, L-1);
+	initializeRecombinationRate(0);
+	
+	// transposon mutation type; also neutral, but red
+	initializeMutationType("m2", 0.5, "f", 0.0);
+	m2.convertToSubstitution = F;
+	m2.color = "#030FFC";
+	
+	// File outputs
+	defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
+	outfile = paste0(output + "output_TE_haploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
+	defineGlobal('outfile', outfile);
+}
+
+
+1 early() {
+	sim.addSubpop("p1", N);
+	sim.tag = 0;	// the next unique tag value to use for TEs
+	p1.setCloningRate(1.0);
+}
+
+1 late() {
+	// create some transposons at random positions
+	genomes = sim.subpopulations.individuals.genome1;
+	positions = rdunif(teInitialCount, 0, L-1);
+	
+	for (teIndex in 0:(teInitialCount-1))
+	{
+		pos = positions[teIndex];
+		mut = genomes.addNewDrawnMutation(m2, pos);
+		mut.tag = sim.tag;
+		sim.tag = sim.tag + 1;
+	}
+	
+	defineGlobal('teAllCounts', matrix(rep(0, N*simTime), simTime, N));
+}
+
+
+1: late() {
+	//Conversion into haploid individuals
+	//Remove any new mutations added to the disabled diploid genomes
+	sim.subpopulations.individuals.genome2.removeMutations();
+	// remove mutations in the haploid genomes that have fixed
+	muts = sim.mutationsOfType(m1);
+	freqs = sim.mutationFrequencies(NULL, muts);
+	if (any(freqs == 0.5))
+		sim.subpopulations.genomes.removeMutations(muts[freqs == 0.5], T);
+		
+	//Recording of the number of TEs per individual	
+	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
+	teAllCounts[sim.cycle-1, ] = teCounts;
+	writeFile(outfile, paste(teCounts, sep=","), append=T);
+	
+	// make active transposons copy themselves with rate teJumpP
+	for (individual in sim.subpopulations.individuals){
+		// fitness rescaling for random lethal transpositions. 
+		nTE = individual.countOfMutationsOfType(m2);
+		
+		if (runif(1) < (1 - teDeathRate) ^ (nTE)) {
+			individual.fitnessScaling = 1.0;}
+		else {
+			individual.fitnessScaling = 0.0;}
+		
+		for (genome in individual.genomes){
+			tes = genome.mutationsOfType(m2);
+			teCount = tes.size();
+			//jumpCount = teCount ? rbinom(1, teCount, teJumpP) else 0;
+			jumpCount = rbinom(1, teCount, teJumpP);
+			
+			if (jumpCount){
+				jumpTEs = sample(tes, jumpCount);
+				
+				for (te in jumpTEs){
+					// make a new TE mutation
+					target = sample(individual.genomes, 1);
+					pos = rdunif(1, 0, L-1);
+					jumpTE = target.addNewDrawnMutation(m2, pos);
+					jumpTE.tag = sim.tag;
+					sim.tag = sim.tag + 1;
+				}
+			}
+		}
+	}
+}
+
+
+simTime late() {
+
+    catn('Output:\n' + outfile);
+
+	x = seqLen(nrow(teAllCounts));
+	mean_TE = sapply(seqLen(nrow(teAllCounts)), "mean(teAllCounts[applyValue,]);");
+	max_TE = sapply(seqLen(nrow(teAllCounts)), "max(teAllCounts[applyValue,]);");
+	min_TE = sapply(seqLen(nrow(teAllCounts)), "min(teAllCounts[applyValue,]);");
+
+	
+	if (exists("slimgui")) {
+		plot = slimgui.createPlot("TE evolution",
+			xlab="Generation", ylab="Number of TEs", width=700, height=500);
+		
+		plot.lines(x, mean_TE, 'red');
+		plot.lines(x, max_TE, 'cornflowerblue');
+		plot.lines(x, min_TE, 'green');
+		plot.addLegend("topLeft", inset=0, labelSize=13);
+		plot.legendLineEntry("mean", "red", lwd=2);
+		plot.legendLineEntry("max", "cornflowerblue", lwd=2);
+		plot.legendLineEntry("min", "green", lwd=2);
+	}
+}
+

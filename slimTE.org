@@ -1,6 +1,0 @@
-#+title: Slim model of TEs
-
-* Model Tasks
-- [ ] Get death rate fitness recalculation working.
-- [ ] Get equilibrium dynamics
-- [ ] Haploid model
