@@ -13,19 +13,38 @@
 - 'L': Genome length (mutations are stackable, so we can use length 1 for efficiency)
 - 'simTime': simulation time in generations
 
-- 'teinitialCount': initial number of TEs in each individual (heterozygous in the diploid model)
+- 'teInitialCount': initial number of TEs in each individual (heterozygous in the diploid model)
 - 'teJumpP': probability of a TE to jump to a random genomic position
 - 'teDeathRate': probability of lethal transposition
 
 * Run simulations from command line
 #+begin_src sh
-slim -d N=1000 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 TE_haploid_WIAS.slim
+slim -d N=10 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 -d simTime=100 TE_haploid_WIAS.slim
 #+end_src
+
+#+RESULTS:
+| //                                                                                                                                  | Initial                   | random | seed: |      |          |
+| 4499646394890965280                                                                                                                 |                           |        |       |      |          |
+|                                                                                                                                     |                           |        |       |      |          |
+| //                                                                                                                                  | RunInitializeCallbacks(): |        |       |      |          |
+| initializeMutationRate(0);                                                                                                          |                           |        |       |      |          |
+| initializeMutationType(1,                                                                                                           | 0.5,                      | "f",   | 0);   |      |          |
+| initializeGenomicElementType(1,                                                                                                     | m1,                       | 1);    |       |      |          |
+| initializeGenomicElement(g1,                                                                                                        | 0,                        | 0);    |       |      |          |
+| initializeRecombinationRate(0);                                                                                                     |                           |        |       |      |          |
+| initializeMutationType(2,                                                                                                           | 0.5,                      | "f",   | 0);   |      |          |
+|                                                                                                                                     |                           |        |       |      |          |
+| //                                                                                                                                  | Starting                  | run    | at    | tick | <start>: |
+| 1                                                                                                                                   |                           |        |       |      |          |
+|                                                                                                                                     |                           |        |       |      |          |
+| Output:                                                                                                                             |                           |        |       |      |          |
+| ~/wias_transposons/output/csv/output_TE_haploid_N1_teInitialCount1_teJumpP0.01_teDeathRate0.0005_simTime100_4499646394890965280.csv |                           |        |       |      |          |
+
 
 * Future considerations from biology
 ** Recombination and genome structure
 How does recombination affect the evolutionary equilibrium of TEs? Choice of the genome size L? What about the cost of replicating a larger genome? Optimization of genome size L, from position-independent deleterious effect of each TE? Realistic genomic density
-Or alternatively more comples up to continuous distribution of fitness effects for TEs, dependent of genomic context and region. Do TE jumps satisfy the infinite sites model of mutation, or, how common does a TE jump into another TE? What about variable recombination landscapes, as repetetive sequence motifs can favor certain recombination breakpoints.
+Or alternatively more comples up to continuous distribution of fitness effects for TEs, dependent of genomic context and region. Do TE jumps satisfy the infinite sites model of mutation, or, how common does a TE jump into another TE? What about variable recombination landscapes, as repetitive sequence motifs can favor certain recombination breakpoints.
 
 ** Deactivation of TEs
 Deactivation of TE due to loss of function (mutational load or loss of function of TE coding region), can be modelled at a steady rate (see SLiM manual section 14.12). Each TE can have a life-cycle, from active (autonnomous) to semi-active (non-autonomous) to dead (pseudo-gene). How do non-autonomous TEs transpose? Is it just an increase probability of gene transfer? The progression of a single TE through these stages is irreversible, and would lead to accumulation of dead TE sequences as determined by the fitness cost of replication.
