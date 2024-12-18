@@ -3,7 +3,7 @@
 initialize() {
 	if (!exists("N")) defineConstant("N", 5000);
 	if (!exists("L")) defineConstant("L", 1);               // chromosome length
-    if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
+    //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
 	//TE dynamics paramters
 	if (!exists("teInitialCount")) defineConstant("teInitialCount", 1);  // initial number of TEs
@@ -24,7 +24,8 @@ initialize() {
 	m2.color = "#030FFC";
 	
 	// File outputs
-	defineConstant("output", "~/wias_transposons/output/csv/"); //output directory, change if necessary.
+	// defineConstant("output", "~/wias_transposons/output/csv/"); //output directory, change if necessary.
+	defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
 	outfile = paste0(output + "output_TE_haploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
 	defineGlobal('outfile', outfile);
 }
