@@ -5,7 +5,7 @@
 - add cli options to diploid model
 - write R script for plotting replicate simulations
   - write simfile parser in R script
-- store parameters in JSON file for default values
+- store parameters in JSON file for default values?
 - add code for batch runs with GNU parallel
 
 * Parameters and Variables
@@ -41,7 +41,7 @@ slim -d N=10 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 -d simTime=100 TE_hapl
 | ~/wias_transposons/output/csv/output_TE_haploid_N1_teInitialCount1_teJumpP0.01_teDeathRate0.0005_simTime100_4499646394890965280.csv |                           |        |       |      |          |
 
 ** Batch simulations from commandline
-Simulation replicates can be run in parallel with GNU parallel.
+Simulation replicates can be run in parallel on 3 or any number of cores with GNU parallel.
 #+begin_src sh
 seq 10 | parallel -j 3 -n0 "slim -d N=5000 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 -d simTime=2000 TE_haploid_WIAS.slim"
 #+end_src
