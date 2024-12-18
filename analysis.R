@@ -5,7 +5,7 @@ N <- 5000
 teInitialCount <- 1
 teJumpP <- 0.01
 teDeathRate <- 0.0005
-simTime <- 1000
+simTime <- 2000
 
 ## File name parsing function
 
@@ -48,7 +48,7 @@ df <- do.call(rbind, lapply(files, extract_TE_data))
 str(df)
 
 ggplot(df, aes(x = generation, y = means, group = replicate)) +
-  geom_line(size = 0.8, color ='blue') +  # Line plot for trajectories
+  geom_line(size = 0.5, color ='blue') +  # Line plot for trajectories
   labs(
     title = "Simulation Trajectories: Means vs Generation",
     x = "Generation",
