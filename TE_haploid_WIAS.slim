@@ -24,8 +24,9 @@ initialize() {
 	m2.color = "#030FFC";
 	
 	// File outputs
-	defineConstant("output", "~/wias_transposons/output/csv/"); //output directory, change if necessary.
+	//defineConstant("output", "~/wias_transposons/output/csv/"); //output directory, change if necessary.
 	// defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
+	defineConstant("output", "./output/csv/"); //output directory, change if necessary.
 	outfile = paste0(output + "output_TE_haploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
 	defineGlobal('outfile', outfile);
 }

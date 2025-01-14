@@ -3,10 +3,8 @@
 * TODO Open Tasks
 - [X] Haploid model
 - add cli options to diploid model
-- write R script for plotting replicate simulations
-  - write simfile parser in R script
 - store parameters in JSON file for default values?
-- add code for batch runs with GNU parallel
+- [X] add code for batch runs with GNU parallel
 
 * Parameters and Variables
 - 'N': Number of individuals

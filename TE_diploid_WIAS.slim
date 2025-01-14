@@ -2,10 +2,12 @@
 
 initialize() {
 	defineConstant("N", 5000);
-	defineConstant("L", 1000);               // chromosome length
-	defineConstant("teInitialCount", 1);  // initial number of TEs
-	
+	defineConstant("L", 1);               // chromosome length
+    //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
+
+
 	//TE dynamics paramters
+	defineConstant("teInitialCount", 1);  // initial number of TEs
 	defineConstant("teJumpP", 0.01);      // TE jump probability
 	defineConstant("teDeathRate", 0.005); //probability of lethal transposition
 	defineConstant("simTime", 100);
@@ -23,7 +25,8 @@ initialize() {
 	m2.color = "#030FFC";
 	
 	// File outputs
-	defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
+	//defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
+	defineConstant("output", "./output/csv/"); //output directory, change if necessary.
 	outfile = paste0(output + "output_TE_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
 	defineGlobal('outfile', outfile);
 }
