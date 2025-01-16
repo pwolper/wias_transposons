@@ -2,7 +2,7 @@ library(ggplot2)
 library(stringr)
 
 model <- 'diploid'
-N <- 50000
+N <- 500000
 teInitialCount <- 1
 teJumpP <- 0.01
 teDeathRate <- 0.0005
@@ -10,8 +10,9 @@ simTime <- 2000
 
 # File name parsing function
 get_simfiles <- function(path='output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime) {
-  pattern <- paste0(model, '_N', N, '_teInitialCount', teInitialCount, '_teJumpP', teJumpP, '_teDeathRate',
+  pattern <- paste0(model, '_N', format(N, scientific=FALSE), '_teInitialCount', teInitialCount, '_teJumpP', teJumpP, '_teDeathRate',
                     format(teDeathRate, scientific=FALSE), '_simTime', simTime)
+  print(pattern)
   files <- list.files(path, pattern = pattern, full.names=TRUE)
   return(files)
 }
