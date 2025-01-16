@@ -1,10 +1,8 @@
 #+title: Slim model of TEs
 
 * TODO Open Tasks
-- [X] Haploid model
-- add cli options to diploid model
-- store parameters in JSON file for default values?
-- [X] add code for batch runs with GNU parallel
+- [ ] reduce memiry footprint of diploid simulations. (save mean and variance of TE number only, not whole matrix)
+- [ ] criterion for equilibrium based on computations?
 
 * Parameters and Variables
 - 'N': Number of individuals

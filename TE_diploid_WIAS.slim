@@ -1,17 +1,16 @@
 // Keywords: 
 
 initialize() {
-	defineConstant("N", 5000);
-	defineConstant("L", 1);               // chromosome length
+	if (!exists("N")) defineConstant("N", 5000);
+	if (!exists("L")) defineConstant("L", 1);               // chromosome length
     //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
-
 	//TE dynamics paramters
-	defineConstant("teInitialCount", 1);  // initial number of TEs
-	defineConstant("teJumpP", 0.01);      // TE jump probability
-	defineConstant("teDeathRate", 0.005); //probability of lethal transposition
-	defineConstant("simTime", 100);
-	
+	if (!exists("teInitialCount")) defineConstant("teInitialCount", 1);  // initial number of TEs
+	if (!exists("teJumpP")) defineConstant("teJumpP", 0.01);      // TE jump probability
+	if (!exists("teDeathRate")) defineConstant("teDeathRate", 0.0005); //probability of lethal transposition
+	if (!exists("simTime")) defineConstant("simTime", 2000);
+
 	//Genomic paramters
 	initializeMutationRate(0);
 	initializeMutationType("m1", 0.5, "f", 0.0);  // neutral
