@@ -24,8 +24,8 @@ initialize() {
 	m2.color = "#030FFC";
 	
 	// File outputs
-	//defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
-	defineConstant("output", "./output/csv/"); //output directory, change if necessary.
+	defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
+	//defineConstant("output", "./output/csv/"); //output directory, change if necessary.
 	outfile = paste0(output + "output_TE_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
 	defineGlobal('outfile', outfile);
 }
@@ -38,16 +38,27 @@ initialize() {
 }
 
 1 late() {
+
 	// create some transposons at random positions
 	genomes = sim.subpopulations.individuals.genome1;
+	genomes2 = sim.subpopulations.individuals.genome2;
+
 	positions = rdunif(teInitialCount, 0, L-1);
-	
+
 	for (teIndex in 0:(teInitialCount-1))
 	{
 		pos = positions[teIndex];
 		mut = genomes.addNewDrawnMutation(m2, pos);
 		mut.tag = sim.tag;
 		sim.tag = sim.tag + 1;
+	}
+
+	for (teIndex in 0:(teInitialCount-1))
+	{
+		pos2 = positions[teIndex];
+		mut2 = genomes2.addNewDrawnMutation(m2,pos2);
+		mut2.tag = sim.tag;
+		sim.tag = sim.tag+1;
 	}
 	
 	defineGlobal('teAllCounts', matrix(rep(0, N*simTime), simTime, N));
