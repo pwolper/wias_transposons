@@ -1,14 +1,14 @@
 // Keywords: 
 
 initialize() {
-	if (!exists("N")) defineConstant("N", 50000);
-	if (!exists("L")) defineConstant("L", 1000);               // chromosome length
+	if (!exists("N")) defineConstant("N", 50);
+	if (!exists("L")) defineConstant("L", 1);               // chromosome length
     //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
 	//TE dynamics paramters
 	if (!exists("teInitialCount")) defineConstant("teInitialCount", 1);  // initial number of TEs
 	if (!exists("teJumpP")) defineConstant("teJumpP", 0.01);      // TE jump probability
-	if (!exists("teDeathRate")) defineConstant("teDeathRate", 0.0005); //probability of lethal transposition
+	if (!exists("teDeathRate")) defineConstant("teDeathRate", 0.001); //probability of lethal transposition
 	if (!exists("simTime")) defineConstant("simTime", 2000);
 
 	//Genomic paramters
@@ -34,7 +34,7 @@ initialize() {
 1 early() {
 	sim.addSubpop("p1", N);
 	sim.tag = 0;	// the next unique tag value to use for TEs
-	p1.setSelfingRate(1.0);
+	//p1.setSelfingRate(1.0);
 }
 
 1 late() {
@@ -59,7 +59,7 @@ initialize() {
 	teAllCounts[sim.cycle-1, ] = teCounts;
 	writeFile(outfile, paste(teCounts, sep=","), append=T);
 	
-	// make active transposons copy themselves with rate teJumpP
+	
 	for (individual in sim.subpopulations.individuals){
 		// fitness rescaling for random lethal transpositions. 
 		nTE = individual.countOfMutationsOfType(m2);
@@ -68,7 +68,8 @@ initialize() {
 			individual.fitnessScaling = 1.0;}
 		else {
 			individual.fitnessScaling = 0.0;}
-		
+			
+		// make active transposons copy themselves with rate teJumpP
 		for (genome in individual.genomes){
 			tes = genome.mutationsOfType(m2);
 			teCount = tes.size();
