@@ -2,39 +2,41 @@
 
 * TODO Open Tasks
 - [ ] reduce memiry footprint of diploid simulations. (save mean and variance of TE number only, not whole matrix)
-- [ ] criterion for equilibrium based on computations?
+- [ ] run simulations for one set of parameters
 
 * Parameters and Variables
 - 'N': Number of individuals
-- 'L': Genome length (mutations are stackable, so we can use length 1 for efficiency)
-- 'simTime': simulation time in generations
-
-- 'teInitialCount': initial number of TEs in each individual (heterozygous in the diploid model)
 - 'teJumpP': probability of a TE to jump to a random genomic position
 - 'teDeathRate': probability of lethal transposition
+- 'simTime': simulation time in generations
+- 'teInitialCount': initial number of TEs in each individual (heterozygous in the diploid model)
+- 'L': Genome length (mutations are stackable, so we can use length 1 for efficiency)
+
+Diploid model only:
+- 'r': recombination rate
+- 'selfRate': self-fertilization rate
+
+** Variables
+- N = [5000, 50000, 500000]
+- tJump = [0.01, 0.001, (10^-4)]
+- teDeath = [0.01, 0.05, 0.1]
+
+* Simulations
+** TODO simplify output recording
+- only record min, mean and max numbers of transposons per generation. Make result parsing more efficient in R, maybe with awk? How much faster is revording only min, mean and max in slim, compared to the whole matrix?
+
+** TODO create bash script to run simulations
+- [ ] bash script to parse variable and execute reps with GNU parallel.
 
 ** Run simulations from command line
 #+begin_src sh
 slim -d N=10 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 -d simTime=100 TE_haploid_WIAS.slim
 #+end_src
 
-#+RESULTS:
-| //                                                                                                                                  | Initial                   | random | seed: |      |          |
-| 4499646394890965280                                                                                                                 |                           |        |       |      |          |
-|                                                                                                                                     |                           |        |       |      |          |
-| //                                                                                                                                  | RunInitializeCallbacks(): |        |       |      |          |
-| initializeMutationRate(0);                                                                                                          |                           |        |       |      |          |
-| initializeMutationType(1,                                                                                                           | 0.5,                      | "f",   | 0);   |      |          |
-| initializeGenomicElementType(1,                                                                                                     | m1,                       | 1);    |       |      |          |
-| initializeGenomicElement(g1,                                                                                                        | 0,                        | 0);    |       |      |          |
-| initializeRecombinationRate(0);                                                                                                     |                           |        |       |      |          |
-| initializeMutationType(2,                                                                                                           | 0.5,                      | "f",   | 0);   |      |          |
-|                                                                                                                                     |                           |        |       |      |          |
-| //                                                                                                                                  | Starting                  | run    | at    | tick | <start>: |
-| 1                                                                                                                                   |                           |        |       |      |          |
-|                                                                                                                                     |                           |        |       |      |          |
-| Output:                                                                                                                             |                           |        |       |      |          |
-| ~/wias_transposons/output/csv/output_TE_haploid_N1_teInitialCount1_teJumpP0.01_teDeathRate0.0005_simTime100_4499646394890965280.csv |                           |        |       |      |          |
+Mulitple parameter sets:
+#+begin_src sh
+parallel slim -d N={1} -d L=1 -d teJumpP={2} -d teDeathRate={3} -d simTime=2000 TE_haploid_WIAS.slim ::: 5000 50000 500000 ::: 0.01 0.05 0.1 ::: 0.01 0.001 0.0001
+#+end_src
 
 ** Batch simulations from commandline
 Simulation replicates can be run in parallel on 3 or any number of cores with GNU parallel.
