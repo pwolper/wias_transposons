@@ -1,12 +1,7 @@
 library(ggplot2)
 library(stringr)
+library(data.table)
 
-model <- 'diploid'
-N <- 500000
-teInitialCount <- 1
-teJumpP <- 0.01
-teDeathRate <- 0.0005
-simTime <- 2000
 
 # File name parsing function
 get_simfiles <- function(path='output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime) {
@@ -30,14 +25,18 @@ extract_params <- function(file) {
 
 # Extract TE mean to dataframe
 extract_TE_data <- function(file) {
-  df <- read.csv(file, stringsAsFactors = FALSE)
+  df <- fread(file)
+  df_matrix <- as.matrix(df)
+
+  means <- rowMeans(df_matrix)
+  row_max <- apply(df_matrix, 1, max)  # Row-wise maximum
+  row_min <- apply(df_matrix, 1, min)  # Row-wise minimum
 
   params <- extract_params(file)
-  means <- rowMeans(df)
   generation <- seq.int(nrow(df))
   replicate <- rep(file, times = length(generation)) # adjust generation time and output in slim
 
-  output_data <- data.frame(replicate, generation, params$N, params$teJumpP, params$teDeathRate, params$simTime, means)
+  output_data <- data.frame(replicate, generation, params$N, params$teJumpP, params$teDeathRate, params$simTime, means, row_min, row_max)
   names(output_data)[3:6] <- c("N", "teJumpP", "teDeathRate", "simTime")
   return(output_data)
 }
@@ -48,6 +47,12 @@ expected_equilibrium <- function(teJumpP, teDeathRate) {
 }
 
 
+model <- 'diploid'
+N <- 5000
+teInitialCount <- 1
+teJumpP <- 0.01
+teDeathRate <- 0.001
+simTime <- 2000
 files <- get_simfiles('output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime)
 paste("Simulation files:", length(files)) # vector of files
 
@@ -57,7 +62,9 @@ str(df)
 title <- paste(' N=', N, ' | ', 'teJumpP=', teJumpP, ' | ', 'teDeathRate:', teDeathRate)
 
 ggplot(df, aes(x = generation, y = means, color = factor(replicate), group = replicate)) +
-  geom_line(size = 0.5, alpha=0.4) +  # Line plot for trajectories
+  geom_line(aes(y = means, color = factor(replicate)), linewidth = 0.5, alpha = 0.7) +
+  geom_line(aes(y = row_min, color = factor(replicate)), linewidth = 0.5, alpha = 0.6, linetype = "dotted") +
+  geom_line(aes(y = row_max, color = factor(replicate)), linewidth = 0.5, alpha = 0.6, linetype = "dashed") +
   labs(
     title = paste('Parameters: ', title),
     x = "Generation",
@@ -65,7 +72,8 @@ ggplot(df, aes(x = generation, y = means, color = factor(replicate), group = rep
     color = "Replicate"
   ) +
   #scale_y_continuous(trans='log10') +
-  ylim(0, 2000) +
+  #ylim(0, 2000) +
+  #ylim(0, 2000) +
   #geom_hline(yintercept = expected_equilibrium(teJumpP, teDeathRate), linetype="dashed", color='red') +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5),  # Center the plot title
