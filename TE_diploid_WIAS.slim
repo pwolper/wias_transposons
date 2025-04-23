@@ -1,7 +1,7 @@
 // Keywords: 
 
 initialize() {
-	if (!exists("N")) defineConstant("N", 500);
+	if (!exists("N")) defineConstant("N", 1000);
 	if (!exists("L")) defineConstant("L", 1);               // chromosome length
     //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
@@ -39,7 +39,7 @@ initialize() {
 
 1 late() {
 	// create some transposons at random positions
-	genomes = sim.subpopulations.individuals.haploidGenome1;
+	genomes = sim.subpopulations.individuals.haplosomes;
 	positions = rdunif(teInitialCount, 0, L-1);
 	
 	for (teIndex in 0:(teInitialCount-1))
@@ -57,7 +57,7 @@ initialize() {
 1: late() {
 	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
 	teAllCounts[sim.cycle-1, ] = teCounts;
-	//writeFile(outfile, paste(teCounts, sep=","), append=T);
+	writeFile(outfile, paste(teCounts, sep=","), append=T); // write line to output file
 	
 	
 	for (individual in sim.subpopulations.individuals){
@@ -95,13 +95,15 @@ initialize() {
 
 simTime late() {
 	
-	x = seqLen(nrow(teAllCounts));
-	mean_TE = sapply(seqLen(nrow(teAllCounts)), "mean(teAllCounts[applyValue,]);");
-	max_TE = sapply(seqLen(nrow(teAllCounts)), "max(teAllCounts[applyValue,]);");
-	min_TE = sapply(seqLen(nrow(teAllCounts)), "min(teAllCounts[applyValue,]);");
 	
 	
 	if (exists("slimgui")) {
+	
+		x = seqLen(nrow(teAllCounts));
+		mean_TE = sapply(seqLen(nrow(teAllCounts)), "mean(teAllCounts[applyValue,]);");
+		max_TE = sapply(seqLen(nrow(teAllCounts)), "max(teAllCounts[applyValue,]);");
+		min_TE = sapply(seqLen(nrow(teAllCounts)), "min(teAllCounts[applyValue,]);");
+	
 		plot = slimgui.createPlot("TE evolution",
 			xlab="Generation", ylab="Number of TEs", width=700, height=500);
 		
