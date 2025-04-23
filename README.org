@@ -1,8 +1,6 @@
 #+title: Slim model of TEs
 
 * TODO Open Tasks
-- [ ] reduce memiry footprint of diploid simulations. (save mean and variance of TE number only, not whole matrix)
-- [ ] run simulations for one set of parameters
 - [ ] is teDeathRate in SLiM d or d/(r+d)? Order of death and transposition events on SLiM code?
 
 * Parameters and Variables
