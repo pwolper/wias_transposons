@@ -21,11 +21,11 @@ Diploid model only:
 - teDeath = [0.01, 0.05, 0.1]
 
 * Simulations
-** TODO simplify output recording
-- only record min, mean and max numbers of transposons per generation. Make result parsing more efficient in R, maybe with awk? How much faster is revording only min, mean and max in slim, compared to the whole matrix?
+** TODO Stopping criterium to simulations
+- define exit state by minimum number of TE's as in Mueller's Ratchet? tMin = 2?
 
-** TODO create bash script to run simulations
-- [ ] bash script to parse variable and execute reps with GNU parallel.
+** TODO Run selfing diploid model
+- plot results
 
 ** Run simulations from command line
 #+begin_src sh
