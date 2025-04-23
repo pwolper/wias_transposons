@@ -3,14 +3,14 @@
 initialize() {
 	if (!exists("N")) defineConstant("N", 5000);
 	if (!exists("L")) defineConstant("L", 1);               // chromosome length
-    //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
-
+	//if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
+	
 	//TE dynamics paramters
 	if (!exists("teInitialCount")) defineConstant("teInitialCount", 1);  // initial number of TEs
 	if (!exists("teJumpP")) defineConstant("teJumpP", 0.01);      // TE jump probability
 	if (!exists("teDeathRate")) defineConstant("teDeathRate", 0.0005); //probability of lethal transposition
 	if (!exists("simTime")) defineConstant("simTime", 2000);
-
+	
 	//Genomic paramters
 	initializeMutationRate(0);
 	initializeMutationType("m1", 0.5, "f", 0.0);  // neutral
@@ -24,9 +24,9 @@ initialize() {
 	m2.color = "#030FFC";
 	
 	// File outputs
-	defineConstant("output", "~/popgen/wias_transposons/output/csv/"); //output directory, change if necessary.
-	//defineConstant("output", "./output/csv/"); //output directory, change if necessary.
-	outfile = paste0(output + "output_TE_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
+	//defineConstant("output", "~/popgen/wias_transposons/output/csv/"); //output directory, change if necessary.
+	defineConstant("output", "./output/csv/"); //output directory, change if necessary.
+	outfile = paste0(output + "output_TE_selfing_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
 	defineGlobal('outfile', outfile);
 }
 
@@ -38,13 +38,12 @@ initialize() {
 }
 
 1 late() {
-
+	
 	// create some transposons at random positions
-	genomes = sim.subpopulations.individuals.haploidGenome1;
-	genomes2 = sim.subpopulations.individuals.haploidGenome2;
-
+	genomes = sim.subpopulations.individuals.haplosomes;
+	
 	positions = rdunif(teInitialCount, 0, L-1);
-
+	
 	for (teIndex in 0:(teInitialCount-1))
 	{
 		pos = positions[teIndex];
@@ -52,14 +51,7 @@ initialize() {
 		mut.tag = sim.tag;
 		sim.tag = sim.tag + 1;
 	}
-
-	for (teIndex in 0:(teInitialCount-1))
-	{
-		pos2 = positions[teIndex];
-		mut2 = genomes2.addNewDrawnMutation(m2,pos2);
-		mut2.tag = sim.tag;
-		sim.tag = sim.tag+1;
-	}
+	
 	
 	defineGlobal('teAllCounts', matrix(rep(0, N*simTime), simTime, N));
 }
@@ -68,7 +60,7 @@ initialize() {
 1: late() {
 	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
 	teAllCounts[sim.cycle-1, ] = teCounts;
-	writeFile(outfile, paste(teCounts, sep=","), append=T);
+	if (!exists("slimgui")) {writeFile(outfile, paste(teCounts, sep=","), append=T);}
 	
 	// make active transposons copy themselves with rate teJumpP
 	for (individual in sim.subpopulations.individuals){

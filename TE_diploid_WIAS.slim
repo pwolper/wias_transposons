@@ -1,7 +1,7 @@
 // Keywords: 
 
 initialize() {
-	if (!exists("N")) defineConstant("N", 1000);
+	if (!exists("N")) defineConstant("N", 5000);
 	if (!exists("L")) defineConstant("L", 1);               // chromosome length
     //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
@@ -57,7 +57,7 @@ initialize() {
 1: late() {
 	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
 	teAllCounts[sim.cycle-1, ] = teCounts;
-	writeFile(outfile, paste(teCounts, sep=","), append=T); // write line to output file
+	if (!exists("slimgui")) {writeFile(outfile, paste(teCounts, sep=","), append=T);} // write line to output file
 	
 	
 	for (individual in sim.subpopulations.individuals){

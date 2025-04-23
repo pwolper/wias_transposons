@@ -67,7 +67,7 @@ initialize() {
 	//Recording of the number of TEs per individual	
 	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
 	teAllCounts[sim.cycle-1, ] = teCounts;
-	writeFile(outfile, paste(teCounts, sep=","), append=T);
+	if (!exists("slimgui")) {writeFile(outfile, paste(teCounts, sep=","), append=T);}
 	
 	// make active transposons copy themselves with rate teJumpP
 	for (individual in sim.subpopulations.individuals){
