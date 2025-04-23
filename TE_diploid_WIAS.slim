@@ -1,7 +1,7 @@
 // Keywords: 
 
 initialize() {
-	if (!exists("N")) defineConstant("N", 50);
+	if (!exists("N")) defineConstant("N", 500);
 	if (!exists("L")) defineConstant("L", 1);               // chromosome length
     //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
@@ -39,7 +39,7 @@ initialize() {
 
 1 late() {
 	// create some transposons at random positions
-	genomes = sim.subpopulations.individuals.genome1;
+	genomes = sim.subpopulations.individuals.haploidGenome1;
 	positions = rdunif(teInitialCount, 0, L-1);
 	
 	for (teIndex in 0:(teInitialCount-1))
@@ -57,7 +57,7 @@ initialize() {
 1: late() {
 	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
 	teAllCounts[sim.cycle-1, ] = teCounts;
-	writeFile(outfile, paste(teCounts, sep=","), append=T);
+	//writeFile(outfile, paste(teCounts, sep=","), append=T);
 	
 	
 	for (individual in sim.subpopulations.individuals){
@@ -70,7 +70,7 @@ initialize() {
 			individual.fitnessScaling = 0.0;}
 			
 		// make active transposons copy themselves with rate teJumpP
-		for (genome in individual.genomes){
+		for (genome in individual.haplosomes){
 			tes = genome.mutationsOfType(m2);
 			teCount = tes.size();
 			//jumpCount = teCount ? rbinom(1, teCount, teJumpP) else 0;
@@ -81,7 +81,7 @@ initialize() {
 				
 				for (te in jumpTEs){
 					// make a new TE mutation
-					target = sample(individual.genomes, 1);
+					target = sample(individual.haplosomes, 1);
 					pos = rdunif(1, 0, L-1);
 					jumpTE = target.addNewDrawnMutation(m2, pos);
 					jumpTE.tag = sim.tag;

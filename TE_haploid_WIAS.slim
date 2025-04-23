@@ -40,7 +40,7 @@ initialize() {
 
 1 late() {
 	// create some transposons at random positions
-	genomes = sim.subpopulations.individuals.genome1;
+	genomes = sim.subpopulations.individuals.haploidGenome1;
 	positions = rdunif(teInitialCount, 0, L-1);
 	
 	for (teIndex in 0:(teInitialCount-1))
@@ -58,7 +58,7 @@ initialize() {
 1: late() {
 	//Conversion into haploid individuals
 	//Remove any new mutations added to the disabled diploid genomes
-	sim.subpopulations.individuals.genome2.removeMutations();
+	sim.subpopulations.individuals.haploidGenome2.removeMutations();
 	// remove mutations in the haploid genomes that have fixed
 	muts = sim.mutationsOfType(m1);
 	freqs = sim.mutationFrequencies(NULL, muts);
@@ -80,7 +80,7 @@ initialize() {
 		else {
 			individual.fitnessScaling = 0.0;}
 		
-		for (genome in individual.genomes){
+		for (genome in individual.haplosomes){
 			tes = genome.mutationsOfType(m2);
 			teCount = tes.size();
 			//jumpCount = teCount ? rbinom(1, teCount, teJumpP) else 0;
@@ -91,7 +91,7 @@ initialize() {
 				
 				for (te in jumpTEs){
 					// make a new TE mutation
-					target = sample(individual.genomes, 1);
+					target = sample(individual.haplosomes, 1);
 					pos = rdunif(1, 0, L-1);
 					jumpTE = target.addNewDrawnMutation(m2, pos);
 					jumpTE.tag = sim.tag;

@@ -1,8 +1,8 @@
 // Keywords: 
 
 initialize() {
-	if (!exists("N")) defineConstant("N", 50000);
-	if (!exists("L")) defineConstant("L", 1000);               // chromosome length
+	if (!exists("N")) defineConstant("N", 5000);
+	if (!exists("L")) defineConstant("L", 1);               // chromosome length
     //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
 	//TE dynamics paramters
@@ -24,7 +24,7 @@ initialize() {
 	m2.color = "#030FFC";
 	
 	// File outputs
-	defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
+	defineConstant("output", "~/popgen/wias_transposons/output/csv/"); //output directory, change if necessary.
 	//defineConstant("output", "./output/csv/"); //output directory, change if necessary.
 	outfile = paste0(output + "output_TE_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
 	defineGlobal('outfile', outfile);
@@ -40,8 +40,8 @@ initialize() {
 1 late() {
 
 	// create some transposons at random positions
-	genomes = sim.subpopulations.individuals.genome1;
-	genomes2 = sim.subpopulations.individuals.genome2;
+	genomes = sim.subpopulations.individuals.haploidGenome1;
+	genomes2 = sim.subpopulations.individuals.haploidGenome2;
 
 	positions = rdunif(teInitialCount, 0, L-1);
 
@@ -80,7 +80,7 @@ initialize() {
 		else {
 			individual.fitnessScaling = 0.0;}
 		
-		for (genome in individual.genomes){
+		for (genome in individual.haplosomes){
 			tes = genome.mutationsOfType(m2);
 			teCount = tes.size();
 			//jumpCount = teCount ? rbinom(1, teCount, teJumpP) else 0;
@@ -91,7 +91,7 @@ initialize() {
 				
 				for (te in jumpTEs){
 					// make a new TE mutation
-					target = sample(individual.genomes, 1);
+					target = sample(individual.haplosomes, 1);
 					pos = rdunif(1, 0, L-1);
 					jumpTE = target.addNewDrawnMutation(m2, pos);
 					jumpTE.tag = sim.tag;
