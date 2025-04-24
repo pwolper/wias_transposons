@@ -52,12 +52,12 @@ expected_equilibrium <- function(teJumpP, teDeathRate) {
 }
 
 
-model <- 'diploid' #haploid, diploid or selfing_diploid
+model <- 'haploid' #haploid, diploid or selfing_diploid
 if (model != 'selfing_diploid') selfRate <- NULL else selfRate <- 1
-N <- 50000
+N <- 5000
 teInitialCount <- 1
 teJumpP <- 0.01
-teDeathRate <- 0.001
+teDeathRate <- 0.0001
 simTime <- 2000
 files <- get_simfiles('output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime, selfRate)
 paste("Simulation files:", length(files)) # vector of files
