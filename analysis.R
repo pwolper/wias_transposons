@@ -4,9 +4,14 @@ library(data.table)
 
 
 # File name parsing function
-get_simfiles <- function(path='output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime) {
-  pattern <- paste0(model, '_N', format(N, scientific=FALSE), '_teInitialCount', teInitialCount, '_teJumpP', teJumpP, '_teDeathRate',
-                    format(teDeathRate, scientific=FALSE), '_simTime', simTime)
+get_simfiles <- function(path='output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime, selfRate=NULL) {
+  pattern <- paste0(
+    "output_TE_", model,
+    if (!is.null(selfRate)) paste0('_selfRate', selfRate),
+    '_N', format(N, scientific=FALSE),
+    '_teInitialCount', teInitialCount, '_teJumpP', teJumpP, '_teDeathRate', format(teDeathRate, scientific=FALSE),
+    '_simTime', simTime)
+
   print(pattern)
   files <- list.files(path, pattern = pattern, full.names=TRUE)
   return(files)
@@ -47,13 +52,14 @@ expected_equilibrium <- function(teJumpP, teDeathRate) {
 }
 
 
-model <- 'diploid'
-N <- 5000
+model <- 'diploid' #haploid, diploid or selfing_diploid
+if (model != 'selfing_diploid') selfRate <- NULL else selfRate <- 1
+N <- 50000
 teInitialCount <- 1
 teJumpP <- 0.01
 teDeathRate <- 0.001
 simTime <- 2000
-files <- get_simfiles('output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime)
+files <- get_simfiles('output/csv', N, teInitialCount, teJumpP, teDeathRate, simTime, selfRate)
 paste("Simulation files:", length(files)) # vector of files
 
 df <- do.call(rbind, lapply(files, extract_TE_data))
@@ -71,7 +77,7 @@ ggplot(df, aes(x = generation, y = means, color = factor(replicate), group = rep
     y = "Mean Value",
     color = "Replicate"
   ) +
-  #scale_y_continuous(trans='log10') +
+  scale_y_continuous(trans='log10') +
   #ylim(0, 2000) +
   #ylim(0, 2000) +
   #geom_hline(yintercept = expected_equilibrium(teJumpP, teDeathRate), linetype="dashed", color='red') +
@@ -79,5 +85,8 @@ ggplot(df, aes(x = generation, y = means, color = factor(replicate), group = rep
   theme(plot.title = element_text(hjust = 0.5),  # Center the plot title
         legend.position = "none")               # Place legend on the right)
 
-filename <- paste0(model ,'_N', N, 'teJumpP', teJumpP, '_teDeathRate', teDeathRate, '_simTime', simTime, '.png')
+filename <- paste0(model , if (!is.null(selfRate)) paste0('_selfRate', selfRate), '_N', N,
+                   'teJumpP', teJumpP, '_teDeathRate', teDeathRate, '_simTime', simTime, '.png')
+print(filename)
+
 ggsave(filename = paste0('output/fig/', filename), height=7, width=10)
