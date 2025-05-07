@@ -1,16 +1,16 @@
 // Keywords: 
 
 initialize() {
-	if (!exists("N")) defineConstant("N", 5000);
+	if (!exists("N")) defineConstant("N", 1000);
 	if (!exists("L")) defineConstant("L", 1);               // chromosome length
-    //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
-
+	//if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
+	
 	//TE dynamics paramters
 	if (!exists("teInitialCount")) defineConstant("teInitialCount", 1);  // initial number of TEs
 	if (!exists("teJumpP")) defineConstant("teJumpP", 0.01);      // TE jump probability
 	if (!exists("teDeathRate")) defineConstant("teDeathRate", 0.001); //probability of lethal transposition
-	if (!exists("simTime")) defineConstant("simTime", 2000);
-
+	if (!exists("simTime")) defineConstant("simTime", 50000);
+	
 	//Genomic paramters
 	initializeMutationRate(0);
 	initializeMutationType("m1", 0.5, "f", 0.0);  // neutral
@@ -26,7 +26,8 @@ initialize() {
 	// File outputs
 	//defineConstant("output", "~/popgen/WIAS/output/csv/"); //output directory, change if necessary.
 	defineConstant("output", "./output/csv/"); //output directory, change if necessary.
-	outfile = paste0(output + "output_TE_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
+	//outfile = paste0(output + "csv_TE_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_simTime" + simTime + "_" + getSeed() + ".csv");
+	outfile = paste0(output + "csv_TE_diploid_N" + N + "_teInitialCount" + teInitialCount + "_teJumpP" + teJumpP + "_teDeathRate" + teDeathRate + "_" + getSeed() + ".csv");
 	defineGlobal('outfile', outfile);
 }
 
@@ -50,14 +51,30 @@ initialize() {
 		sim.tag = sim.tag + 1;
 	}
 	
-	defineGlobal('teAllCounts', matrix(rep(0, N*simTime), simTime, N));
+	//defineGlobal('teAllCounts', matrix(rep(0, N*simTime), simTime, N));
 }
 
 
 1: late() {
-	teCounts = sim.subpopulations.individuals.countOfMutationsOfType(m2);
-	teAllCounts[sim.cycle-1, ] = teCounts;
-	if (!exists("slimgui")) {writeFile(outfile, paste(teCounts, sep=","), append=T);} // write line to output file
+	teCounts = sim.subpopulations.haplosomes.countOfMutationsOfType(m2);
+	
+	conditionalVector = ifelse(teCounts > teInitialCount, T, F);
+	allTrue = all(conditionalVector);
+	
+	if (allTrue) {
+		catn("Exited meta-stable state in generation: " + sim.cycle);
+		
+		if (!exists("slimgui")) {
+		header = paste("N","transpo_rate","proba_death","replicate","time_min_changed", sep=",");
+		body = paste(N, teJumpP, teDeathRate, getSeed(), sim.cycle, sep=",");
+		content = paste(header, body, sep="\n");
+		writeFile(outfile, content);
+		}			
+		
+		sim.simulationFinished();
+	}
+	//teAllCounts[sim.cycle-1, ] = teCounts; //full matrix
+	//if (!exists("slimgui")) {writeFile(outfile, paste(teCounts, sep=","), append=T);} 
 	
 	
 	for (individual in sim.subpopulations.individuals){
@@ -68,7 +85,7 @@ initialize() {
 			individual.fitnessScaling = 1.0;}
 		else {
 			individual.fitnessScaling = 0.0;}
-			
+		
 		// make active transposons copy themselves with rate teJumpP
 		for (genome in individual.haplosomes){
 			tes = genome.mutationsOfType(m2);
@@ -93,27 +110,26 @@ initialize() {
 }
 
 
-simTime late() {
+50000 late() {
 	
 	
 	
-	if (exists("slimgui")) {
-	
-		x = seqLen(nrow(teAllCounts));
-		mean_TE = sapply(seqLen(nrow(teAllCounts)), "mean(teAllCounts[applyValue,]);");
-		max_TE = sapply(seqLen(nrow(teAllCounts)), "max(teAllCounts[applyValue,]);");
-		min_TE = sapply(seqLen(nrow(teAllCounts)), "min(teAllCounts[applyValue,]);");
-	
-		plot = slimgui.createPlot("TE evolution",
-			xlab="Generation", ylab="Number of TEs", width=700, height=500);
-		
-		plot.lines(x, mean_TE, 'red');
-		plot.lines(x, max_TE, 'cornflowerblue');
-		plot.lines(x, min_TE, 'green');
-		plot.addLegend("topLeft", inset=0, labelSize=13);
-		plot.legendLineEntry("mean", "red", lwd=2);
-		plot.legendLineEntry("max", "cornflowerblue", lwd=2);
-		plot.legendLineEntry("min", "green", lwd=2);
-	}
+	//	if (exists("slimgui")) {
+	//
+	//		x = seqLen(nrow(teAllCounts));
+	//		mean_TE = sapply(seqLen(nrow(teAllCounts)), "mean(teAllCounts[applyValue,]);");
+	//		max_TE = sapply(seqLen(nrow(teAllCounts)), "max(teAllCounts[applyValue,]);");
+	//		min_TE = sapply(seqLen(nrow(teAllCounts)), "min(teAllCounts[applyValue,]);");
+	//
+	//		plot = slimgui.createPlot("TE evolution",
+	//			xlab="Generation", ylab="Number of TEs", width=700, height=500);
+	//
+	//		plot.lines(x, mean_TE, 'red');
+	//		plot.lines(x, max_TE, 'cornflowerblue');
+	//		plot.lines(x, min_TE, 'green');
+	//		plot.addLegend("topLeft", inset=0, labelSize=13);
+	//		plot.legendLineEntry("mean", "red", lwd=2);
+	//		plot.legendLineEntry("max", "cornflowerblue", lwd=2);
+	//		plot.legendLineEntry("min", "green", lwd=2);
+	//	}
 }
-
