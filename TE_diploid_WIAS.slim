@@ -111,7 +111,17 @@ initialize() {
 
 
 50000 late() {
-	
+
+	catn("Simulation timed out, after 50.000 generations");
+
+	if (!exists("slimgui")) {
+	header = paste("N","selfRate","transpo_rate","proba_death","replicate","time_min_changed", sep=",");
+	body = paste(N, selfRate, teJumpP, teDeathRate, getSeed(), "NA", sep=",");
+	content = paste(header, body, sep="\n");
+	writeFile(outfile, content);
+	}
+
+	sim.simulationFinished();
 	
 	
 	//	if (exists("slimgui")) {

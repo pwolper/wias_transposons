@@ -1,7 +1,7 @@
 #+title: Slim model of TEs
 
 * TODO Open Tasks
-- [ ] is teDeathRate in SLiM d or d/(r+d)? Order of death and transposition events on SLiM code?
+- [ ] run diploid, selfing code with exit criterium.
 
 * Parameters and Variables
 - 'N': Number of individuals
