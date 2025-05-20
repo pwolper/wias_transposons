@@ -6,4 +6,7 @@
 
 #parallel -j 3 --dry-run slim -d N={1} -d L=1 -d teJumpP={2} -d teDeathRate={3} -d simTime=2000 TE_haploid_WIAS.slim ::: 5000 50000 500000 ::: 0.01 0.05 0.1 ::: 0.01 0.001 0.0001
 #parallel --dry-run slim -d N={1} -d L=1 -d teJumpP={2} -d teDeathRate={3} -d simTime=2000 -d replicate={4} TE_haploid_WIAS.slim ::: 10 100  ::: 0.01 0.05 ::: 0.01 0.001 ::: $(seq 10)
-parallel --verbose slim -d N={1} -d L=1 -d teJumpP=0.01 -d teDeathRate={2} -d simTime=2000 -d replicate={3} TE_diploid_selfing_WIAS.slim ::: 5000 50000 ::: 0.001 0.0005 0.0001 ::: $(seq 10)
+# parallel --verbose slim -d N={1} -d L=1 -d teJumpP=0.01 -d teDeathRate={2} -d simTime=2000 -d replicate={3} TE_diploid_selfing_WIAS.slim ::: 5000 50000 ::: 0.001 0.0005 0.0001 ::: $(seq 10)
+
+# Run exit time simulations for all parameter values
+parallel --verbose slim -d N={1} -d teJumpP={2} -d teDeathRate={3} -d replicate={4} TE_diploid_selfing_WIAS.slim ::: 5000 10000 20000 50000 100000 ::: 0.01 0.001 0.0001 ::: 0.1 0.05 0.01 ::: $(seq 10)
