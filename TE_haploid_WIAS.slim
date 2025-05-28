@@ -1,13 +1,13 @@
 // Keywords: 
 
 initialize() {
-	if (!exists("N")) defineConstant("N", 50000);
+	if (!exists("N")) defineConstant("N", 5);
 	if (!exists("L")) defineConstant("L", 1);               // chromosome length
     //if (!exists("recombinationRate")) defineConstant("recombinationRate", 0);
 
 	//TE dynamics paramters
 	if (!exists("teInitialCount")) defineConstant("teInitialCount", 1);  // initial number of TEs
-	if (!exists("teJumpP")) defineConstant("teJumpP", 0.01);      // TE jump probability
+	if (!exists("teJumpP")) defineConstant("teJumpP", 0.1);      // TE jump probability
 	if (!exists("teDeathRate")) defineConstant("teDeathRate", 0.0005); //probability of lethal transposition
 	if (!exists("simTime")) defineConstant("simTime", 2000);
 	
@@ -84,7 +84,6 @@ initialize() {
 			teCount = tes.size();
 			//jumpCount = teCount ? rbinom(1, teCount, teJumpP) else 0;
 			jumpCount = rbinom(1, teCount, teJumpP);
-			
 			if (jumpCount){
 				jumpTEs = sample(tes, jumpCount);
 				
