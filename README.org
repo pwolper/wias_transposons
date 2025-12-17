@@ -1,5 +1,5 @@
 #+title: SLiM model of TEs
-This repo contains the SLiM model of TE dzynamics developed at WIAS, 2024 in Berlin. 
+This repo contains the SLiM model of TE dynamics developed at WIAS, 2024 in Berlin. 
 
 * Parameters and Variables
 - 'N': Number of individuals
@@ -44,6 +44,8 @@ Simulation replicates can be run by giving slim the (non-existant) variable repl
 #+begin_src sh
 parallel slim -d N={1} -d L=1 -d teJumpP={2} -d teDeathRate={3} -d simTime=2000 -d replicate={4} TE_haploid_WIAS.slim ::: 5000 50000 500000 ::: 0.01 0.05 0.1 ::: 0.01 0.001 0.0001 ::: $(seq 10)
 #+end_src
+
+Simulations on the cluster will probably have to be run with slurm or similar using the single command shown above. 
 
 * Future considerations from biology
 ** Recombination and genome structure
