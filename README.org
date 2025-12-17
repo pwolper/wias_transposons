@@ -1,7 +1,5 @@
-#+title: Slim model of TEs
-
-* TODO Open Tasks
-- [ ] run diploid, selfing code with exit criterium.
+#+title: SLiM model of TEs
+This repo contains the SLiM model of TE dzynamics developed at WIAS, 2024 in Berlin. 
 
 * Parameters and Variables
 - 'N': Number of individuals
@@ -31,9 +29,6 @@ Diploid model only:
 ** TODO Stopping criterium to simulations
 - define exit state by minimum number of TE's as in Mueller's Ratchet? tMin = 2?
 
-** TODO Run selfing diploid model
-- plot results
-
 ** Run simulations from command line
 #+begin_src sh
 slim -d N=10 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 -d simTime=100 TE_haploid_WIAS.slim
@@ -49,7 +44,6 @@ Simulation replicates can be run by giving slim the (non-existant) variable repl
 #+begin_src sh
 parallel slim -d N={1} -d L=1 -d teJumpP={2} -d teDeathRate={3} -d simTime=2000 -d replicate={4} TE_haploid_WIAS.slim ::: 5000 50000 500000 ::: 0.01 0.05 0.1 ::: 0.01 0.001 0.0001 ::: $(seq 10)
 #+end_src
-
 
 * Future considerations from biology
 ** Recombination and genome structure
