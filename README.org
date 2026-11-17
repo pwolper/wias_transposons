@@ -26,9 +26,6 @@ Diploid model only:
 | $f$                   | Self-fertilization rate                           | 1                                     |
 
 * Simulations
-** TODO Stopping criterium to simulations
-- define exit state by minimum number of TE's as in Mueller's Ratchet? tMin = 2?
-
 ** Run simulations from command line
 #+begin_src sh
 slim -d N=10 -d L=1 -d teJumpP=0.01 -d teDeathRate=0.0005 -d simTime=100 TE_haploid_WIAS.slim
@@ -44,15 +41,3 @@ Simulation replicates can be run by giving slim the (non-existant) variable repl
 #+begin_src sh
 parallel slim -d N={1} -d L=1 -d teJumpP={2} -d teDeathRate={3} -d simTime=2000 -d replicate={4} TE_haploid_WIAS.slim ::: 5000 50000 500000 ::: 0.01 0.05 0.1 ::: 0.01 0.001 0.0001 ::: $(seq 10)
 #+end_src
-
-Simulations on the cluster will probably have to be run with slurm or similar using the single command shown above. 
-
-* Future considerations from biology
-** Recombination and genome structure
-How does recombination affect the evolutionary equilibrium of TEs? Choice of the genome size L? What about the cost of replicating a larger genome? Optimization of genome size L, from position-independent deleterious effect of each TE? Realistic genomic density
-Or alternatively more comples up to continuous distribution of fitness effects for TEs, dependent of genomic context and region. Do TE jumps satisfy the infinite sites model of mutation, or, how common does a TE jump into another TE? What about variable recombination landscapes, as repetitive sequence motifs can favor certain recombination breakpoints.
-
-** Deactivation of TEs
-Deactivation of TE due to loss of function (mutational load or loss of function of TE coding region), can be modelled at a steady rate (see SLiM manual section 14.12). Each TE can have a life-cycle, from active (autonnomous) to semi-active (non-autonomous) to dead (pseudo-gene). How do non-autonomous TEs transpose? Is it just an increase probability of gene transfer? The progression of a single TE through these stages is irreversible, and would lead to accumulation of dead TE sequences as determined by the fitness cost of replication.
-
-Alternatively, TE activation can be of active, epigenetic nature from the 'host'. In such case, how are the TEs deactivated? In large bursts? At potentially disruptive positions? Epigenetically, inactivated TEs could reactivate again as well, potentially mediated by environmental conditions or epigenetic reprogramming.
